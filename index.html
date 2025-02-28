@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลโรงเรียน - Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/footer.css">    
+    <style>
+            :root {
+            --main-color: #5342ed;
+            --light-color: #f7f7f7;
+            --grey-color: #9f9f9f;
+            --dark-color: #000000;
+            --primary-color: #4B0082;
+            --secondary-color: #D63384;
+            --darkprimary-color: #9b42f5;
+            }
+
+        .h-1 {
+            color:var(--primary-color);
+        }
+
+        /* CSS สำหรับ Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 5px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .row {
+            display: flex;
+            justify-content:center;
+            padding-left: 8rem;
+            flex-wrap: wrap;
+        }
+        .col {
+            flex: 1;
+            min-width: 45%;
+            padding: 10px;
+        }
+
+        .h-2 {
+            color:var(--primary-color);
+        }
+        .h-2 tr th {
+            color:var(--primary-color);
+        }
+        .col label {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 5px;
+        }
+        .btn-secondary {
+            background-color: var(--primary-color);
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 50px;
+        }
+        .btn-secondary:hover  {
+            color: #fff;
+            background-color: #000;
+            border-radius: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Tab Container -->
+    <div class="tab-container-p">
+        <div class="tab-container text-center">
+            <button class="active" onclick="openTab('allData')">ข้อมูลทั้งหมด</button>
+            <button onclick="openTab('approvedData')">ที่อนุมัติแล้ว</button>
+            <button onclick="openTab('pendingData')">ยังไม่อนุมัติ</button>
+        </div>
+    </div>
+    <!--Modal สำหรับแสดงข้อมูล -->
+    <div id="schoolModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="text-center h-2">ข้อมูลโรงเรียนทั้งหมด</h2>
+            <div id="modalBody" class="row">
+                <!-- Modal แสดงตรงนี้ -->
+            </div>
+            <button class="btn btn-secondary mt-3" onclick="closeModal()">ปิด</button>
+        </div>
+    </div>
+    <br>
+    <!-- Tab Content -->
+    <div class="content-1">
+        <div class="content">
+            <div class="logo-form">
+                <img src="/assets/image/img01.png" alt="Logo" class="hero-logo-form">
+            </div>
+            <h1 class="text-center h-1">ระบบจัดการข้อมูลโรงเรียน</h1>
+            <br>
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="form-control" id="searchInput" placeholder="ค้นหาชื่อโรงเรียน"
+                    onkeyup="searchTable()">
+            </div>
+            <!-- ข้อมูลทั้งหมด -->
+            <div id="allData" class="table-container active">
+                <h2 class="h-2">ข้อมูลทั้งหมด</h2>
+                <table class="table table-striped">
+                    <thead  class="h-2">
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อโรงเรียน</th>
+                            <th>หลักฐาน</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันที่สิ้นสุด</th>
+                            <th>ดูข้อมูลทั้งหมด</th>
+                            <th>แก้ไขข้อมูล</th>
+                            <th>อนุมัติ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="allDataTableBody">
+                        <tr id="section-1">
+                            <td>1</td>
+                            <td>โรงเรียนตัวอย่าง 1</td>
+                            <td><a href="#">ไฟล์หลักฐาน</a></td>
+                            <td>01/01/2025</td>
+                            <td>31/12/2025</td>
+                            <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(1)">ดูข้อมูล</button></td>
+                            <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(1)">แก้ไขข้อมูล</button></td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle1" onchange="toggleApproval(1, this.checked)" title="สวิตซ์">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label" id="status1">ยังไม่อนุมัติ</span>
+                            </td>
+                        </tr>
+                        <tr id="section-2">
+                            <td>2</td>
+                            <td>โรงเรียนตัวอย่าง 2</td>
+                            <td><a href="#">ไฟล์หลักฐาน</a></td>
+                            <td>15/02/2025</td>
+                            <td>15/08/2025</td>
+                            <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(2)">ดูข้อมูล</button></td>
+                            <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(2)">แก้ไขข้อมูล</button></td>
+                            <td>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggle2" name="toggle2" onchange="toggleApproval(2, this.checked)" title="สวิตซ์">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-label" id="status2">ยังไม่อนุมัติ</span>
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+            <!-- ที่อนุมัติแล้ว -->
+            <div id="approvedData" class="table-container">
+                <h2 class="h-2">ที่อนุมัติแล้ว</h2>
+                <table class="table table-striped">
+                    <thead class="h-2">
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อโรงเรียน</th>
+                            <th>หลักฐาน</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันที่สิ้นสุด</th>
+                            <th>ดูข้อมูลทั้งหมด</th>
+                            <th>แก้ไขข้อมูล</th>
+                            <th>อนุมัติ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvedDataTableBody">
+                        <!-- ข้อมูลจะถูกเพิ่มอัตโนมัติเมื่ออนุมัติ -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- ยังไม่อนุมัติ -->
+            <div id="pendingData" class="table-container">
+                <h2 class="h-2">ยังไม่อนุมัติ</h2>
+                <table class="table table-striped">
+                    <thead  class="h-2">
+                        <tr>
+                            <th>ลำดับ</th>
+                            <th>ชื่อโรงเรียน</th>
+                            <th>หลักฐาน</th>
+                            <th>วันที่เริ่ม</th>
+                            <th>วันที่สิ้นสุด</th>
+                            <th>ดูข้อมูลทั้งหมด</th>
+                            <th>แก้ไขข้อมูล</th>
+                            <th>อนุมัติ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingDataTableBody">
+                        <!-- จะถูกดึงข้อมูลจาก "ข้อมูลทั้งหมด" โดยอัตโนมัติ -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+        <!-- footer -->
+        <footer id="footer" class="footer-1">
+            <div class="container footer-container">
+                <!-- Left Section -->
+                <div class="footer-left">
+                    <h1>ระบบจัดการข้อมูลโรงเรียน</h1>
+                    <p>คณะครุศาสตร์ <br> มหาวิทยาลัยราชภัฏเลย</p>
+                </div>
+    
+                <div class="footer-right">
+                    <p><strong>ติดต่อเรา :</strong></p>
+                    <p>E-mail: xxxxxxxxx@gmail.com</p>
+                </div>
+            </div>
+            <br>
+            <br>
+            <hr>
+            <p class="text-secondary">Developed and maintained by Nuengdiao Tiaksiboon, Full-Stack Developer</p>
+            <p class="text-secondary">
+                © 2025 NanoDev . /
+                <a href="#">Terms of Use</a> /
+                <a href="#">Privacy Policy</a> /
+                <a href="#">Code of Conduct</a> /
+                <a href="#">System Status</a>
+            </p>
+        </footer>
+
+        <script>
+            // ฟังก์ชันเปิดแท็บ
+            function openTab(tabName) {
+                document.querySelectorAll('.table-container').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-container button').forEach(btn => btn.classList.remove('active'));
+            
+                document.getElementById(tabName).classList.add('active');
+                document.querySelector(`button[onclick="openTab('${tabName}')"]`).classList.add('active');
+            
+                if (tabName === 'pendingData') {
+                    updatePendingTable();
+                }
+            }
+            
+            // ฟังก์ชันค้นหาในตาราง
+            function searchTable() {
+                const input = document.getElementById('searchInput').value.toLowerCase();
+                const activeTab = document.querySelector('.table-container.active tbody');
+                if (!activeTab) return;
+            
+                Array.from(activeTab.getElementsByTagName('tr')).forEach(row => {
+                    const schoolName = row.cells[1]?.textContent.toLowerCase() || '';
+                    row.style.display = schoolName.includes(input) ? '' : 'none';
+                });
+            }
+
+            // ฟังก์ชันแก้ไขข้อมูล (เพิ่มส่วนนี้)
+            function editSchool(id) {
+            window.location.href = `edit.html?id=${id}`;
+            }
+            
+            // ฟังก์ชันสลับสถานะอนุมัติ
+            function toggleApproval(id, isChecked) {
+                const statusElement = document.getElementById(`status${id}`);
+                statusElement.textContent = isChecked ? 'อนุมัติแล้ว' : 'ยังไม่อนุมัติ';
+                statusElement.className = `toggle-label ${isChecked ? 'text-success' : 'text-danger'}`;
+            
+                // อัปเดตข้อมูลในตารางทั้งหมด
+                updateTables(id, isChecked);
+            
+                alert(`สถานะโรงเรียน ID: ${id} ถูกอัปเดตเป็น ${isChecked ? 'อนุมัติแล้ว' : 'ยังไม่อนุมัติ'}`);
+            }
+            
+            // ฟังก์ชันอัปเดตข้อมูลในตารางทั้งหมด
+            function updateTables(id, isApproved) {
+                const allRows = document.getElementById('allDataTableBody').getElementsByTagName('tr');
+                const approvedBody = document.getElementById('approvedDataTableBody');
+                const pendingBody = document.getElementById('pendingDataTableBody');
+            
+                // ค้นหาและอัปเดตแถวใน "ข้อมูลทั้งหมด"
+                for (let row of allRows) {
+                    if (row.cells[0].textContent === id.toString()) {
+                        const checkbox = row.querySelector('input[type="checkbox"]');
+                        checkbox.checked = isApproved;
+                        const statusLabel = row.querySelector('.toggle-label');
+                        statusLabel.textContent = isApproved ? 'อนุมัติแล้ว' : 'ยังไม่อนุมัติ';
+                        statusLabel.className = `toggle-label ${isApproved ? 'text-success' : 'text-danger'}`;
+                        break;
+                    }
+                }
+            
+                // อัปเดตตาราง "ที่อนุมัติแล้ว"
+                if (isApproved) {
+                    let targetRow = null;
+                    for (let row of allRows) {
+                        if (row.cells[0].textContent === id.toString()) {
+                            targetRow = row.cloneNode(true);
+                            break;
+                        }
+                    }
+                    if (targetRow) {
+                        // อัปเดตปุ่มสลับสถานะในแถวใหม่
+                        targetRow.querySelector('input[type="checkbox"]').checked = true;
+                        targetRow.querySelector('.toggle-label').textContent = 'อนุมัติแล้ว';
+                        targetRow.querySelector('.toggle-label').className = 'toggle-label text-success';
+                        targetRow.querySelector('input[type="checkbox"]').setAttribute('onchange', `toggleApproval(${id}, this.checked)`);
+                        approvedBody.appendChild(targetRow);
+                    }
+                } else {
+                    // ถ้ายกเลิกอนุมัติ ลบออกจาก "ที่อนุมัติแล้ว"
+                    const approvedRows = approvedBody.getElementsByTagName('tr');
+                    for (let i = 0; i < approvedRows.length; i++) {
+                        if (approvedRows[i].cells[0].textContent === id.toString()) {
+                            approvedRows[i].remove();
+                            break;
+                        }
+                    }
+                }
+            
+                // อัปเดตตาราง "ยังไม่อนุมัติ"
+                updatePendingTable();
+            }
+            
+            // ฟังก์ชันอัปเดตตาราง "ยังไม่อนุมัติ"
+            function updatePendingTable() {
+                const allRows = document.getElementById('allDataTableBody').getElementsByTagName('tr');
+                const pendingBody = document.getElementById('pendingDataTableBody');
+            
+                // ล้างข้อมูลเก่าใน "ยังไม่อนุมัติ"
+                pendingBody.innerHTML = '';
+            
+                // ดึงเฉพาะข้อมูลที่ยังไม่อนุมัติจาก "ข้อมูลทั้งหมด"
+                Array.from(allRows).forEach(row => {
+                    const isApproved = row.querySelector('input[type="checkbox"]').checked;
+                    if (!isApproved) {
+                        const clonedRow = row.cloneNode(true);
+                        clonedRow.querySelector('input[type="checkbox"]').setAttribute('onchange', `toggleApproval(${row.cells[0].textContent}, this.checked)`);
+                        pendingBody.appendChild(clonedRow);
+                    }
+                });
+            }
+            
+            // ตั้งค่าเริ่มต้นเมื่อโหลดหน้า
+            document.addEventListener('DOMContentLoaded', () => {
+                openTab('allData'); // เปิดแท็บ "ข้อมูลทั้งหมด" เป็นค่าเริ่มต้น
+                updatePendingTable(); // อัปเดตแท็บ "ยังไม่อนุมัติ" ตอนโหลดหน้า
+            });
+
+
+
+            // ฟังก์ชันเปิดแท็บ, searchTable, toggleApproval, updateTables, updatePendingTable เหมือนเดิม
+
+        // ข้อมูลสมมติสำหรับทดสอบ (ในชีวิตจริงควรดึงจากฐานข้อมูล)
+        const schoolData = {
+            1: {
+                schoolName: "โรงเรียนตัวอย่าง 1",
+                affiliation: "สพฐ.",
+                address: "123 ถนนตัวอย่าง",
+                province: "เลย",
+                district: "เมืองเลย",
+                subdistrict: "กุดป่อง",
+                postalCode: "42000",
+                workPhone: "042123456",
+                director: "นายตัวอย่าง หนึ่ง",
+                mobilePhone: "0812345678",
+                email: "example1@school.com",
+                distanceFromUniversity: "5",
+                distanceFromDistrict: "2",
+                transport: "มีรถประจำทาง",
+                facility: "มีที่พัก",
+                evaluation: "รอบ 4",
+                dataDateStart: "01/01/2025",
+                dataDateEnd: "31/12/2025",
+
+                educationLevel: "ประถมศึกษา",
+                primaryLevel: "ป.1 - ป.6",
+                evaluationDocument: "ไฟล์หลักฐาน.pdf",
+                teacherCount: "20",
+                maleTeacherCount: "10",
+                femaleTeacherCount: "10",
+                otherPersonnel: "ภารโรง",
+                otherPersonnelCount: "2",
+                totalStudents: "500",
+                award: "รางวัลโรงเรียนดีเด่น",
+                subject: "คณิตศาสตร์",
+                quantity: "2",
+                grade: "ประถม 6",
+                tutors: "1",
+                tutorName: "นายครู หนึ่ง",
+                degree: "ปริญญาตรี",
+                major: "คณิตศาสตร์",
+                assistantSubject: "คณิตศาสตร์",
+                level: "ประถมปลาย"
+            },
+            2: {
+                schoolName: "โรงเรียนตัวอย่าง 2",
+                affiliation: "สพฐ.",
+                address: "456 ถนนตัวอย่าง",
+                province: "เลย",
+                district: "ด่านซ้าย",
+                subdistrict: "ด่านซ้าย",
+                postalCode: "42120",
+                workPhone: "042654321",
+                director: "นางตัวอย่าง สอง",
+                mobilePhone: "0898765432",
+                email: "example2@school.com",
+                distanceFromUniversity: "10",
+                distanceFromDistrict: "3",
+                transport: "ไม่มีรถประจำทาง",
+                facility: "ไม่มีที่พัก",
+                evaluation: "รอบ 3",
+                dataDateStart: "15/02/2025",
+                dataDateEnd: "15/08/2025",
+                educationLevel: "มัธยมศึกษา",
+                secondaryLevel: "ม.1 - ม.3",
+                evaluationDocument: "ไฟล์หลักฐาน2.pdf",
+                teacherCount: "15",
+                maleTeacherCount: "7",
+                femaleTeacherCount: "8",
+                otherPersonnel: "เจ้าหน้าที่ธุรการ",
+                otherPersonnelCount: "1",
+                totalStudents: "300",
+                award: "รางวัลโรงเรียนสะอาด",
+                subject: "วิทยาศาสตร์ทั่วไป",
+                quantity: "1",
+                grade: "ม.3",
+                tutors: "1",
+                tutorName: "นางครู สอง",
+                degree: "ปริญญาโท",
+                major: "วิทยาศาสตร์",
+                assistantSubject: "วิทยาศาสตร์ทั่วไป",
+                level: "มัธยมต้น"
+            }
+        };
+
+        // ฟังก์ชันดูข้อมูล
+        function viewDetails(id) {
+            const data = schoolData[id];
+            if (!data) {
+                alert("ไม่พบข้อมูลโรงเรียน");
+                return;
+            }
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="col">
+                    <p><label>ชื่อโรงเรียน:</label> ${data.schoolName}</p>
+                    <p><label>สังกัด:</label> ${data.affiliation}</p>
+                    <p><label>ที่อยู่:</label> ${data.address}</p>
+                    <p><label>จังหวัด:</label> ${data.province}</p>
+                    <p><label>อำเภอ:</label> ${data.district}</p>
+                    <p><label>ตำบล:</label> ${data.subdistrict}</p>
+                    <p><label>รหัสไปรษณีย์:</label> ${data.postalCode}</p>
+                    <p><label>โทรศัพท์ (ที่ทำงาน):</label> ${data.workPhone}</p>
+                    <p><label>ผู้อำนวยการ:</label> ${data.director}</p>
+                    <p><label>โทรศัพท์ (มือถือ):</label> ${data.mobilePhone}</p>
+                    <p><label>E-mail:</label> ${data.email}</p>
+                    <p><label>ระยะทางจากมหาวิทยาลัย:</label> ${data.distanceFromUniversity} กม.</p>
+                    <p><label>ระยะจากจากอำเภอ:</label> ${data.distanceFromDistrict} กม.</p>
+                    <p><label>การเดินทาง:</label> ${data.transport}</p>
+                    <p><label>สิ่งอำนวยความสะดวก:</label> ${data.facility}</p>
+                    <p><label>ผลประเมิน สมศ.:</label> ${data.evaluation}</p>
+                    <p><label>วันที่เริ่ม:</label> ${data.dataDateStart}</p>
+                    <p><label>วันที่สิ้นสุด:</label> ${data.dataDateEnd}</p>
+                </div>
+                <div class="col">
+                    <p><label>ระดับการศึกษา:</label> ${data.educationLevel} (${data.primaryLevel || data.secondaryLevel || ''})</p>
+                    <p><label>หลักฐาน:</label> ${data.evaluationDocument}</p>
+                    <p><label>จำนวนครูทั้งหมด:</label> ${data.teacherCount}</p>
+                    <p><label>ครูชาย:</label> ${data.maleTeacherCount}</p>
+                    <p><label>ครูหญิง:</label> ${data.femaleTeacherCount}</p>
+                    <p><label>บุคลากรอื่น:</label> ${data.otherPersonnel}</p>
+                    <p><label>จำนวนบุคลากรอื่น:</label> ${data.otherPersonnelCount}</p>
+                    <p><label>จำนวนนักเรียน:</label> ${data.totalStudents}</p>
+                    <p><label>รางวัล:</label> ${data.award}</p>
+                    <p><label>สาขาวิชาที่ต้องการ:</label> ${data.subject}</p>
+                    <p><label>จำนวนนักศึกษาฝึกสอน:</label> ${data.quantity}</p>
+                    <p><label>ระดับชั้น:</label> ${data.grade}</p>
+                    <p><label>จำนวนครูพี่เลี้ยง:</label> ${data.tutors}</p>
+                    <p><label>ชื่อครูพี่เลี้ยง:</label> ${data.tutorName}</p>
+                    <p><label>วุฒิการศึกษา:</label> ${data.degree}</p>
+                    <p><label>วิชาเอก:</label> ${data.major}</p>
+                    <p><label>วิชาที่สอน:</label> ${data.assistantSubject}</p>
+                    <p><label>ระดับชั้นที่สอน:</label> ${data.level}</p>
+                </div>
+            `;
+
+            document.getElementById('schoolModal').style.display = 'block';
+        }
+
+        // ฟังก์ชันปิด Modal
+        function closeModal() {
+            document.getElementById('schoolModal').style.display = 'none';
+        }
+
+        // ปิด Modal เมื่อคลิกนอก Modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('schoolModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // ฟังก์ชันแก้ไขข้อมูล
+        function editSchool(id) {
+            window.location.href = `edit.html?id=${id}`;
+        }
+
+        </script>
+</body>
+</html>
