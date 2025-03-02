@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +10,7 @@
     <link rel="stylesheet" href="/assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/footer.css">    
     <style>
-            :root {
+        :root {
             --main-color: #5342ed;
             --light-color: #f7f7f7;
             --grey-color: #9f9f9f;
@@ -19,13 +18,38 @@
             --primary-color: #4B0082;
             --secondary-color: #D63384;
             --darkprimary-color: #9b42f5;
-            }
-
-        .h-1 {
-            color:var(--primary-color);
         }
 
-        /* CSS สำหรับ Modal */
+        .h-1 {
+            color: var(--primary-color);
+        }
+
+        /* ปรับตารางให้ responsive */
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* เพิ่มการเลื่อนแนวนอนในหน้าจอเล็ก */
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
+
+        .table th, .table td {
+            vertical-align: middle; /* จัดกึ่งกลางแนวตั้ง */
+            padding: 0.75rem; /* เพิ่ม padding ให้อ่านง่าย */
+        }
+
+        .h-2 {
+            color: var(--primary-color);
+        }
+
+        .h-2 tr th {
+            color: var(--primary-color);
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -37,15 +61,17 @@
             overflow: auto;
             background-color: rgba(0,0,0,0.4);
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
+            width: 90%; /* ปรับให้เล็กลงในหน้าจอเล็ก */
             max-width: 900px;
             border-radius: 5px;
         }
+
         .close {
             color: #aaa;
             float: right;
@@ -53,32 +79,30 @@
             font-weight: bold;
             cursor: pointer;
         }
+
         .close:hover {
             color: black;
         }
+
         .row {
             display: flex;
-            justify-content:center;
-            padding-left: 8rem;
+            justify-content: center;
             flex-wrap: wrap;
+            padding-left: 5rem;
         }
+
         .col {
             flex: 1;
-            min-width: 45%;
+            min-width: 300px;
             padding: 10px;
         }
 
-        .h-2 {
-            color:var(--primary-color);
-        }
-        .h-2 tr th {
-            color:var(--primary-color);
-        }
         .col label {
             font-weight: bold;
             color: var(--primary-color);
             margin-right: 5px;
         }
+
         .btn-secondary {
             background-color: var(--primary-color);
             border: none;
@@ -88,10 +112,48 @@
             font-size: 16px;
             border-radius: 50px;
         }
-        .btn-secondary:hover  {
+
+        .btn-secondary:hover {
             color: #fff;
             background-color: #000;
             border-radius: 50px;
+        }
+
+        /* Media Queries สำหรับหน้าจอขนาดเล็ก */
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 14px; /* ลดขนาดตัวอักษร */
+                padding: 0.5rem;
+            }
+
+            .btn-sm {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+
+            .search-bar .form-control {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 12px;
+                padding: 0.3rem;
+            }
+
+            .toggle-switch {
+                transform: scale(0.8); /* ลดขนาดสวิตช์ */
+            }
+
+            .btn-sm {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
         }
     </style>
 </head>
@@ -104,18 +166,20 @@
             <button onclick="openTab('pendingData')">ยังไม่อนุมัติ</button>
         </div>
     </div>
-    <!--Modal สำหรับแสดงข้อมูล -->
+
+    <!-- Modal -->
     <div id="schoolModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <span class="close" onclick="closeModal()">×</span>
             <h2 class="text-center h-2">ข้อมูลโรงเรียนทั้งหมด</h2>
             <div id="modalBody" class="row">
-                <!-- Modal แสดงตรงนี้ -->
+                <!-- Modal content -->
             </div>
             <button class="btn btn-secondary mt-3" onclick="closeModal()">ปิด</button>
         </div>
     </div>
     <br>
+
     <!-- Tab Content -->
     <div class="content-1">
         <div class="content">
@@ -126,103 +190,110 @@
             <br>
             <!-- Search Bar -->
             <div class="search-bar">
-                <input type="text" class="form-control" id="searchInput" placeholder="ค้นหาชื่อโรงเรียน"
-                    onkeyup="searchTable()">
+                <input type="text" class="form-control" id="searchInput" placeholder="ค้นหาชื่อโรงเรียน" onkeyup="searchTable()">
             </div>
+
             <!-- ข้อมูลทั้งหมด -->
             <div id="allData" class="table-container active">
                 <h2 class="h-2">ข้อมูลทั้งหมด</h2>
-                <table class="table table-striped">
-                    <thead  class="h-2">
-                        <tr>
-                            <th>ลำดับ</th>
-                            <th>ชื่อโรงเรียน</th>
-                            <th>หลักฐาน</th>
-                            <th>วันที่เริ่ม</th>
-                            <th>วันที่สิ้นสุด</th>
-                            <th>ดูข้อมูลทั้งหมด</th>
-                            <th>แก้ไขข้อมูล</th>
-                            <th>อนุมัติ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allDataTableBody">
-                        <tr id="section-1">
-                            <td>1</td>
-                            <td>โรงเรียนตัวอย่าง 1</td>
-                            <td><a href="#">ไฟล์หลักฐาน</a></td>
-                            <td>01/01/2025</td>
-                            <td>31/12/2025</td>
-                            <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(1)">ดูข้อมูล</button></td>
-                            <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(1)">แก้ไขข้อมูล</button></td>
-                            <td>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="toggle1" onchange="toggleApproval(1, this.checked)" title="สวิตซ์">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="toggle-label" id="status1">ยังไม่อนุมัติ</span>
-                            </td>
-                        </tr>
-                        <tr id="section-2">
-                            <td>2</td>
-                            <td>โรงเรียนตัวอย่าง 2</td>
-                            <td><a href="#">ไฟล์หลักฐาน</a></td>
-                            <td>15/02/2025</td>
-                            <td>15/08/2025</td>
-                            <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(2)">ดูข้อมูล</button></td>
-                            <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(2)">แก้ไขข้อมูล</button></td>
-                            <td>
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="toggle2" name="toggle2" onchange="toggleApproval(2, this.checked)" title="สวิตซ์">
-                                    <span class="slider"></span>
-                                </label>
-                                <span class="toggle-label" id="status2">ยังไม่อนุมัติ</span>
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
+                <div class="table-responsive"> <!-- เพิ่ม table-responsive -->
+                    <table class="table table-striped">
+                        <thead class="h-2">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อโรงเรียน</th>
+                                <th>หลักฐาน</th>
+                                <th>วันที่เริ่ม</th>
+                                <th>วันที่สิ้นสุด</th>
+                                <th>ดูข้อมูลทั้งหมด</th>
+                                <th>แก้ไขข้อมูล</th>
+                                <th>อนุมัติ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allDataTableBody">
+                            <tr id="section-1">
+                                <td>1</td>
+                                <td>โรงเรียนตัวอย่าง 1</td>
+                                <td><a href="#">ไฟล์หลักฐาน</a></td>
+                                <td>01/01/2025</td>
+                                <td>31/12/2025</td>
+                                <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(1)">ดูข้อมูล</button></td>
+                                <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(1)">แก้ไขข้อมูล</button></td>
+                                <td>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggle1" onchange="toggleApproval(1, this.checked)" title="สวิตซ์">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="status1">ยังไม่อนุมัติ</span>
+                                </td>
+                            </tr>
+                            <tr id="section-2">
+                                <td>2</td>
+                                <td>โรงเรียนตัวอย่าง 2</td>
+                                <td><a href="#">ไฟล์หลักฐาน</a></td>
+                                <td>15/02/2025</td>
+                                <td>15/08/2025</td>
+                                <td><button class="custom-btn btn-view btn-sm" onclick="viewDetails(2)">ดูข้อมูล</button></td>
+                                <td><button class="custom-btn btn-edit btn-sm" onclick="editSchool(2)">แก้ไขข้อมูล</button></td>
+                                <td>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggle2" name="toggle2" onchange="toggleApproval(2, this.checked)" title="สวิตซ์">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="status2">ยังไม่อนุมัติ</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
             <!-- ที่อนุมัติแล้ว -->
             <div id="approvedData" class="table-container">
                 <h2 class="h-2">ที่อนุมัติแล้ว</h2>
-                <table class="table table-striped">
-                    <thead class="h-2">
-                        <tr>
-                            <th>ลำดับ</th>
-                            <th>ชื่อโรงเรียน</th>
-                            <th>หลักฐาน</th>
-                            <th>วันที่เริ่ม</th>
-                            <th>วันที่สิ้นสุด</th>
-                            <th>ดูข้อมูลทั้งหมด</th>
-                            <th>แก้ไขข้อมูล</th>
-                            <th>อนุมัติ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="approvedDataTableBody">
-                        <!-- ข้อมูลจะถูกเพิ่มอัตโนมัติเมื่ออนุมัติ -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="h-2">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อโรงเรียน</th>
+                                <th>หลักฐาน</th>
+                                <th>วันที่เริ่ม</th>
+                                <th>วันที่สิ้นสุด</th>
+                                <th>ดูข้อมูลทั้งหมด</th>
+                                <th>แก้ไขข้อมูล</th>
+                                <th>อนุมัติ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvedDataTableBody">
+                            <!-- ข้อมูลจะถูกเพิ่มอัตโนมัติเมื่ออนุมัติ -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
             <!-- ยังไม่อนุมัติ -->
             <div id="pendingData" class="table-container">
                 <h2 class="h-2">ยังไม่อนุมัติ</h2>
-                <table class="table table-striped">
-                    <thead  class="h-2">
-                        <tr>
-                            <th>ลำดับ</th>
-                            <th>ชื่อโรงเรียน</th>
-                            <th>หลักฐาน</th>
-                            <th>วันที่เริ่ม</th>
-                            <th>วันที่สิ้นสุด</th>
-                            <th>ดูข้อมูลทั้งหมด</th>
-                            <th>แก้ไขข้อมูล</th>
-                            <th>อนุมัติ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pendingDataTableBody">
-                        <!-- จะถูกดึงข้อมูลจาก "ข้อมูลทั้งหมด" โดยอัตโนมัติ -->
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="h-2">
+                            <tr>
+                                <th>ลำดับ</th>
+                                <th>ชื่อโรงเรียน</th>
+                                <th>หลักฐาน</th>
+                                <th>วันที่เริ่ม</th>
+                                <th>วันที่สิ้นสุด</th>
+                                <th>ดูข้อมูลทั้งหมด</th>
+                                <th>แก้ไขข้อมูล</th>
+                                <th>อนุมัติ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingDataTableBody">
+                            <!-- จะถูกดึงข้อมูลจาก "ข้อมูลทั้งหมด" โดยอัตโนมัติ -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
